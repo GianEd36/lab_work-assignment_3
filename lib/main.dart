@@ -17,7 +17,9 @@ class HomeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => ProductProvider(),)
+        ChangeNotifierProvider(
+          create: (context) => ProductProvider(),
+        )
       ],
       child: MaterialApp(
         home: HomeScreen(),
@@ -32,13 +34,18 @@ class HomeScreen extends StatelessWidget {
   late Realm realm;
   late RealmResults<Product> items;
 
+  var firstCtrl = TextEditingController();
+  var secondCtrl = TextEditingController();
+  var thirdCtrl = TextEditingController();
+  var fourthCtrl = TextEditingController();
+
   void loadRealmDB() {
     items = realm.all<Product>();
     //Provider call
   }
 
   void initStateBootleg() {
-    var config = Configuration.local([Product.schema]);
+    var config = Configuration.local([Product.schema], schemaVersion: 2);
     realm = Realm(config);
     loadRealmDB();
   }
@@ -62,15 +69,26 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          ListView.builder(
-            itemCount: items.length,
-            itemBuilder: (BuildContext context, int index) {
-              var item = items[index];
-              return ListTile(
-                leading: Icon(item.isFavorite ? Icons.favorite_outline : Icons.favorite) ,
-                title: Text(item.name),
-              );
-            },
+          Expanded(
+            child: Consumer<ProductProvider>(
+              builder: (context, products, child) {
+                return ListView.builder(
+                  itemCount: products.count,
+                  itemBuilder: (BuildContext context, int index) {
+                    var product = products.items[index];
+                    return ListTile(
+                      leading: Icon(product.isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_outline),
+                      title: Text(product.name),
+                      trailing: IconButton(
+                          onPressed: () {},
+                          icon: Icon(Icons.shopping_cart_outlined)),
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -87,21 +105,25 @@ class HomeScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
+                controller: firstCtrl,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(), labelText: 'Code'),
               ),
               Gap(12),
               TextField(
+                controller: secondCtrl,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(), labelText: 'Name'),
               ),
               Gap(12),
               TextField(
+                controller: thirdCtrl,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(), labelText: 'Description'),
               ),
               Gap(12),
               TextField(
+                controller: fourthCtrl,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(), labelText: 'Price'),
               ),
@@ -113,10 +135,31 @@ class HomeScreen extends StatelessWidget {
                   Navigator.of(context).pop();
                 },
                 child: Text('Cancel')),
-            ElevatedButton(onPressed: () {}, child: Text('ADD'))
+            ElevatedButton(
+                onPressed: () => doAddProductOnRealm(context),
+                child: Text('ADD'))
           ],
         );
       },
     );
+  }
+
+  void clearControllers() {
+    firstCtrl.clear();
+    secondCtrl.clear();
+    thirdCtrl.clear();
+    fourthCtrl.clear();
+  }
+
+  void doAddProductOnRealm(BuildContext context) {
+    var item = Product(firstCtrl.text, secondCtrl.text, thirdCtrl.text,
+        double.tryParse(fourthCtrl.text) ?? 0,
+        isFavorite: false);
+    //adding in provider
+    Provider.of<ProductProvider>(context, listen: false)
+        .doAddNewProductProvider(item);
+    //utilities
+    clearControllers();
+    loadRealmDB();
   }
 }

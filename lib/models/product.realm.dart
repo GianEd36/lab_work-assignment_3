@@ -11,11 +11,11 @@ class Product extends _Product with RealmEntity, RealmObjectBase, RealmObject {
   static var _defaultsSet = false;
 
   Product(
-    int code,
+    String code,
     String name,
     String description,
     double price, {
-    bool? isFavorite = false,
+    bool isFavorite = false,
   }) {
     if (!_defaultsSet) {
       _defaultsSet = RealmObjectBase.setDefaults<Product>({
@@ -32,9 +32,9 @@ class Product extends _Product with RealmEntity, RealmObjectBase, RealmObject {
   Product._();
 
   @override
-  int get code => RealmObjectBase.get<int>(this, 'code') as int;
+  String get code => RealmObjectBase.get<String>(this, 'code') as String;
   @override
-  set code(int value) => RealmObjectBase.set(this, 'code', value);
+  set code(String value) => RealmObjectBase.set(this, 'code', value);
 
   @override
   String get name => RealmObjectBase.get<String>(this, 'name') as String;
@@ -54,10 +54,9 @@ class Product extends _Product with RealmEntity, RealmObjectBase, RealmObject {
   set price(double value) => RealmObjectBase.set(this, 'price', value);
 
   @override
-  bool? get isFavorite =>
-      RealmObjectBase.get<bool>(this, 'isFavorite') as bool?;
+  bool get isFavorite => RealmObjectBase.get<bool>(this, 'isFavorite') as bool;
   @override
-  set isFavorite(bool? value) => RealmObjectBase.set(this, 'isFavorite', value);
+  set isFavorite(bool value) => RealmObjectBase.set(this, 'isFavorite', value);
 
   @override
   Stream<RealmObjectChanges<Product>> get changes =>
@@ -105,11 +104,11 @@ class Product extends _Product with RealmEntity, RealmObjectBase, RealmObject {
     RealmObjectBase.registerFactory(Product._);
     register(_toEJson, _fromEJson);
     return const SchemaObject(ObjectType.realmObject, Product, 'Product', [
-      SchemaProperty('code', RealmPropertyType.int),
+      SchemaProperty('code', RealmPropertyType.string),
       SchemaProperty('name', RealmPropertyType.string),
       SchemaProperty('description', RealmPropertyType.string),
       SchemaProperty('price', RealmPropertyType.double),
-      SchemaProperty('isFavorite', RealmPropertyType.bool, optional: true),
+      SchemaProperty('isFavorite', RealmPropertyType.bool),
     ]);
   }();
 

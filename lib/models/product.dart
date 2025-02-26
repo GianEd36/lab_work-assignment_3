@@ -4,9 +4,9 @@ part 'product.realm.dart'; // declare a part file.
 
 @RealmModel()
 class _Product {
-  late int code;
+  late String code;
   late String name;
   late String description;
   late double price;
-  bool? isFavorite = false;
+  late bool isFavorite = false;
 }
